@@ -2,6 +2,7 @@ package pf
 
 import (
 	"image"
+	"log"
 
 	"github.com/gonum/plot/vg/draw"
 	"github.com/gonum/plot/vg/vgimg"
@@ -22,15 +23,37 @@ func IsX() bool {
 }
 
 func StartX() {
-	app = x11ui.NewApp(false, 500, 300)
+	app = x11ui.NewApp(false, 500, 400)
 	app.SetDefaultKeys()
-	childwin = app.NewChildWindow("Figure", 0, 0, 500, 300)
-	rawimg = childwin.CreateRawImage(0, 0, 500, 300)
+	childwin = app.NewChildWindow("Figure", 0, 0, 500, 400)
+	// app.SetLayoutSpacing(50, 50)
+	// app.NewChildWindow("Figure 2", 500, 200)
+	// app.NewChildWindow("Figure 2", 500, 200)
+	// app.NewChildWindow("Figure 2", 500, 200)
+	app.RegisterKey("s", SavePng)
+	app.RegisterKey("z", ZoomIn)
+	app.RegisterKey("n", ShowNext)
+	app.RegisterKey("p", ShowPrev)
 
+	app.RegisterKey("shiftZ", ZoomOut)
+	rawimg = childwin.CreateRawImage(0, 0, 500, 400)
 	vgopts := vgimg.NewWith(vgimg.UseImage(rawimg))
 	canvas = draw.New(vgopts)
 
 }
+
+func ZoomIn() {
+	canvas.Scale(1.5, 1.5)
+	ShowX11()
+}
+
+func ZoomOut() {
+	log.Print("Scale from", canvas.Size())
+	canvas.Scale(.5, .5)
+
+	ShowX11()
+}
+
 func Wait() {
 	app.Show()
 }
@@ -39,6 +62,9 @@ func CloseAll() {
 	app.Close()
 }
 func ShowX11() {
+	if app == nil {
+		return
+	}
 	if gcf != nil {
 
 		gcf.Draw(canvas)
